@@ -6,9 +6,10 @@
 """
 
 
-import click
 import json
 import textwrap
+
+import click
 from prettytable import PrettyTable
 
 from .core import analyze_url
@@ -22,13 +23,20 @@ def wrap(text):
 @click.command()
 @click.version_option()
 @click.argument("url", required=True)
-@click.option("--json", "to_json", flag_value=True, help="Print the Security Headers analysis as JSON")
+@click.option(
+    "--json",
+    "to_json",
+    flag_value=True,
+    help="Print the Security Headers analysis as JSON",
+)
 def cli(url, to_json):
     """Get Security Headers from a given URL.
     The data is fetched from SecurityHeaders.io.
     """
     if not to_json:
-        click.echo("==> Analyzing Security Headers of {0}".format(click.style(url, bold=True)))
+        click.echo(
+            "==> Analyzing Security Headers of {0}".format(click.style(url, bold=True))
+        )
 
     # analyze security headers of given URL
     data = analyze_url(url)
@@ -37,6 +45,7 @@ def cli(url, to_json):
         click.echo(json.dumps(data, indent=4, sort_keys=True))
     else:
         click.echo("➤ Site: {0}".format(click.style(data["site"], bold=True)))
+        click.echo("➤ Rating: {0}".format(click.style(data["rating"], bold=True)))
         click.echo("➤ IP Address: {0}".format(click.style(data["ip"], bold=True)))
         click.echo(click.style("➤ Security Headers:", bold=True))
 
@@ -48,7 +57,7 @@ def cli(url, to_json):
         header_styles = {
             "info": ("white", False),
             "good": ("green", True),
-            "bad": ("red", True)
+            "bad": ("red", True),
         }
 
         for header, info in data["headers"].items():

@@ -5,11 +5,14 @@
 """
 
 import os
-import requests
 from collections import OrderedDict
+
+import requests
 from bs4 import BeautifulSoup
 
-__SECURITY_HEADERS_URL__ = os.environ.get("SEUCRITY_HEADERS_URL", "https://securityheaders.io/?q={0}")
+__SECURITY_HEADERS_URL__ = os.environ.get(
+    "SEUCRITY_HEADERS_URL", "https://securityheaders.io/?q={0}"
+)
 
 
 def analyze_url(url):
@@ -27,25 +30,39 @@ def analyze_url(url):
     response = requests.get(api_url)
 
     soup = BeautifulSoup(response.text, "html.parser")
-    data["ip"] = soup.find_all("th", "tableLabel", text="IP Address:")[0].find_next_sibling("td").text.strip()
-    data["site"] = soup.find_all("th", "tableLabel", text="Site:")[0].find_next_sibling("td").text.strip()
+    data["ip"] = (
+        soup.find_all("th", "tableLabel", text="IP Address:")[0]
+        .find_next_sibling("td")
+        .text.strip()
+    )
+    data["rating"] = (
+        soup.find("div", attrs={"class": "reportTitle"}, text="Security Report Summary")
+        .parent.find("div", attrs={"class": "score"})
+        .find("span")
+        .text.strip()
+    )
+    data["site"] = (
+        soup.find_all("th", "tableLabel", text="Site:")[0]
+        .find_next_sibling("td")
+        .text.strip()
+    )
 
     headers = OrderedDict()
     # Parse Raw Headers Report Table
     for header, value in get_report_table("Raw Headers", soup):
-        headers[header] = {
-            "rating": "info",
-            "value": value
-        }
+        headers[header] = {"rating": "info", "value": value}
 
     # Parse ratings from badges
-    raw_headers = soup.find_all("th", "tableLabel", text="Headers:")[0].find_next_sibling("td").find_all("li")
+    raw_headers = (
+        soup.find_all("th", "tableLabel", text="Headers:")[0]
+        .find_next_sibling("td")
+        .find_all("li")
+    )
     for raw_header in raw_headers:
         rating = "good" if "pill-green" in raw_header["class"] else "bad"
         if raw_header.text not in headers:
             headers[raw_header.text] = {}
         headers[raw_header.text]["rating"] = rating
-
 
     # Parse Missing Headers Report Table
     for header, value in get_report_table("Missing Headers", soup):
@@ -70,7 +87,9 @@ def get_report_table(title, soup):
         :rtype: generator
     """
     try:
-        report_body = soup.find_all("div", "reportTitle", text=title)[0].find_next_sibling("div")
+        report_body = soup.find_all("div", "reportTitle", text=title)[
+            0
+        ].find_next_sibling("div")
     except IndexError:
         return []
     else:

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring
 
+import codecs
 import os
 import re
-import codecs
+
 from setuptools import setup
 
 
@@ -22,7 +23,8 @@ def get_meta(name):
     """
     meta_match = re.search(
         r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=name.upper()),
-        __META_DATA__, re.M
+        __META_DATA__,
+        re.M,
     )
 
     if not meta_match:
@@ -47,14 +49,11 @@ setup(
     download_url=get_meta("url"),
     packages=["securityheaders"],
     package_data={"": ["*.md"]},
-    install_requires=[
-        "click",
-        "requests",
-        "prettytable",
-        "beautifulsoup4"
-    ],
+    install_requires=["click", "requests", "prettytable", "beautifulsoup4"],
     include_package_data=True,
-    entry_points={"console_scripts": ["securityheaders = securityheaders.__main__:cli"]},
+    entry_points={
+        "console_scripts": ["securityheaders = securityheaders.__main__:cli"]
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
@@ -76,9 +75,12 @@ setup(
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation",
         "Topic :: Education :: Testing",
         "Topic :: Software Development",
-        "Topic :: Software Development :: Testing"
+        "Topic :: Software Development :: Testing",
     ],
 )
